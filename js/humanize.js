@@ -485,14 +485,15 @@
   humanize.humanizeSeconds = function(seconds, numWords) {
     if (seconds === 0)
       return "0 minutes";
+    seconds = Math.abs(seconds)
 
-    var week = Math.floor(seconds / (7 * 24 * 60 * 60));
+    var week = Math.floor(seconds / (5 * 8 * 60 * 60));
     var weekS = (week == 1) ? " week" : " weeks";
-    seconds = seconds % (7 * 24 * 60 * 60);
+    seconds = seconds % (5 * 8 * 60 * 60);
 
-    var day = Math.floor(seconds / (24 * 60 * 60));
+    var day = Math.floor(seconds / (8 * 60 * 60));
     var dayS = (day == 1) ? " day" : " days";
-    seconds = seconds % (24 * 60 * 60);
+    seconds = seconds % (8 * 60 * 60);
 
     var hour = Math.floor(seconds / 3600);
     var hourS = (hour == 1) ? " hour" : " hours";
