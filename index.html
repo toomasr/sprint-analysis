@@ -7,6 +7,7 @@
 			/* .table { background-image: url(/images/background2.jpg); } */
 		</style>
                 <script type="text/javascript" src="js/jquery.js"></script>
+                <script type="text/javascript" src="js/humanize.js"></script>
                 <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 
                 <script type="text/javascript">
@@ -25,7 +26,7 @@ function visualizeData() {
           drawIssueTypeCountChart(issueData['issueTypeCount'])
           drawIssueTypeHoursChart(issueData['issueTypeHours'])
           drawIssueTypeOHoursChart(issueData['issueTypeOHours'])
-          drawIssuesTable(issueData['issuesByType'])
+          drawIssuesTable(issueData['issuesByType'], issueData['issueTypeOHours'], issueData['issueTypeHours'])
         }
   });
 }
@@ -116,8 +117,10 @@ function drawIssueTypeCountChart(typeData) {
   }
 
   var options = {'title':'Sprint breakdown by issue count',
-                        'width':600,
-                        'height':500};
+                  'width':600,
+                  'height':400,
+                  'colors':["#dc3912", "#3366cc", "#ff9900", "#109618"]
+                };
   var chart = new google.visualization.PieChart($('#issue_count_chart')[0]);
   chart.draw(data, options);
 }
@@ -132,8 +135,10 @@ function drawIssueTypeHoursChart(typeData) {
   }
 
   var options = {'title':'Sprint breakdown by time invested',
-                        'width':600,
-                        'height':500};
+                  'width':600,
+                  'height':400,
+                  'colors':["#dc3912", "#3366cc", "#ff9900", "#109618"]
+  };
   var chart = new google.visualization.PieChart($('#issue_hours_chart')[0]);
   chart.draw(data, options);
 }
@@ -148,16 +153,21 @@ function drawIssueTypeOHoursChart(typeData) {
   }
 
   var options = {'title':'Sprint breakdown by original estimate',
-                        'width':600,
-                        'height':500};
+                  'width':600,
+                  'height':400,
+                  'colors':["#dc3912", "#3366cc", "#ff9900", "#109618"]
+  };
   var chart = new google.visualization.PieChart($('#issue_o_hours_chart')[0]);
   chart.draw(data, options);
 }
 
-function drawIssuesTable(issues) {
+function drawIssuesTable(issues, byOHours, byHours) {
   for (var issueType in issues) {
     // cycle by issue
-    var section = "<tr><td><h3>" + issueType + "</h3><table>";
+    var section = "<tr><td><h3>" + issueType;
+    section = section + "s ("+ humanize.humanizeSeconds(byHours[issueType], 3) + " - ";
+    section = section + humanize.humanizeSeconds(byOHours[issueType], 3) + ")";
+    section = section + "</h3><table>";
     var subRows = new Array()
     for (var i = 0; i < issues[issueType].length; i++) {
       var issue = issues[issueType][i]
