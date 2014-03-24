@@ -1,0 +1,198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<head>
+		<title>Sprint Analysis</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<style type="text/css">
+			/* .table { background-image: url(/images/background2.jpg); } */
+		</style>
+                <script type="text/javascript" src="js/jquery.js"></script>
+                <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+                <script type="text/javascript">
+
+google.load('visualization', '1.0', {'packages':['corechart']});
+google.setOnLoadCallback(visualizeData);
+
+function visualizeData() {
+  $.ajax({
+        type: "GET",
+        url: "http://localhost/toomasr/sprint-analysis/input.xml",
+        dataType: "text",
+        success: function(data) {
+          var issueData = parseData(data)
+          // console.log(issueData['issuesByType'])
+          drawIssueTypeCountChart(issueData['issueTypeCount'])
+          drawIssueTypeHoursChart(issueData['issueTypeHours'])
+          drawIssueTypeOHoursChart(issueData['issueTypeOHours'])
+          drawIssuesTable(issueData['issuesByType'])
+        }
+  });
+}
+
+function parseData(xmlText) {
+  xmlDoc = $.parseXML(xmlText)
+  $xml = $( xmlDoc )
+
+  var data = {'issueTypeCount':{}, 'issueTypeHours':{}, 'issueTypeOHours':{},
+                'issuesByType':{}}
+  var table = $("#general")
+  $xml.find("rss channel item").each(
+    function() {
+      var title = $($(this).find("title")).text(); 
+      var assignee = $($(this).find("assignee")).text(); 
+
+      // Sometimes can be Nan, true for Epics for example 
+      var oEstimateString = $($(this).find("timeoriginalestimate")).text(); 
+      var oEstimateSeconds = $($(this).find("timeoriginalestimate")).attr("seconds"); 
+      oEstimateSeconds = parseInt(oEstimateSeconds)
+      if (isNaN(oEstimateSeconds))
+        oEstimateSeconds = 0;
+
+
+      // Sometimes can be NaN, especially when the sprint is actually in progress
+      var timespentString = $($(this).find("timespent")).text(); 
+      var timespentSeconds = $($(this).find("timespent")).attr("seconds"); 
+      timespentSeconds = parseInt(timespentSeconds)
+      if (isNaN(timespentSeconds))
+        timespentSeconds = 0;
+
+      var key = $($(this).find("key")).text(); 
+      var type = $($(this).find("type")).text(); 
+      var parentId = $($(this).find("parent")).attr("id")
+
+      // if no parent is specified we use issue type for stats
+      if (typeof parentId == "undefined") {
+        if (isNaN(parseInt(data['issueTypeCount'][type])))
+          data['issueTypeCount'][type] = 1
+        else
+          data['issueTypeCount'][type]++;
+
+        if (isNaN(parseInt(data['issueTypeHours'][type])))
+          data['issueTypeHours'][type] = timespentSeconds
+        else
+          data['issueTypeHours'][type] += timespentSeconds;
+
+        if (isNaN(parseInt(data['issueTypeOHours'][type])))
+          data['issueTypeOHours'][type] = oEstimateSeconds
+        else
+          data['issueTypeOHours'][type] += oEstimateSeconds;
+      }
+      // if the case has a parent we look at the parent type
+      else {
+        // find parent case issue type
+        $xml.find("rss channel item key[id='"+parentId+"']").each(
+          function() {
+            var parentType = $(this).parent().find("type").text()
+            if (isNaN(parseInt(data['issueTypeCount'][parentType])))
+              data['issueTypeCount'][parentType] = 1
+            else
+              data['issueTypeCount'][parentType]++;
+            }
+        );
+      }
+
+      // also lets add to the issues collection
+      if (typeof data['issuesByType'][type] == "undefined") {
+        data['issuesByType'][type] = new Array();
+      }
+      data['issuesByType'][type].push(
+                { 'title':title, 'key': key, 'parentId':parentId,
+                  'oEstimate':oEstimateSeconds, 'estimate':timespentSeconds})
+
+      //console.log(key, oEstimateString, oEstimate, assignee, title, type)
+    }
+  )
+  return data;
+}
+
+function drawIssueTypeCountChart(typeData) {
+  var data = new google.visualization.DataTable();
+  data.addColumn("string", "Type")
+  data.addColumn("number", "Number")
+
+  for (item in typeData) {
+    data.addRow([item, typeData[item]])
+  }
+
+  var options = {'title':'Sprint breakdown by issue count',
+                        'width':600,
+                        'height':500};
+  var chart = new google.visualization.PieChart($('#issue_count_chart')[0]);
+  chart.draw(data, options);
+}
+
+function drawIssueTypeHoursChart(typeData) {
+  var data = new google.visualization.DataTable();
+  data.addColumn("string", "Type")
+  data.addColumn("number", "Number")
+
+  for (item in typeData) {
+    data.addRow([item, typeData[item]])
+  }
+
+  var options = {'title':'Sprint breakdown by time invested',
+                        'width':600,
+                        'height':500};
+  var chart = new google.visualization.PieChart($('#issue_hours_chart')[0]);
+  chart.draw(data, options);
+}
+
+function drawIssueTypeOHoursChart(typeData) {
+  var data = new google.visualization.DataTable();
+  data.addColumn("string", "Type")
+  data.addColumn("number", "Number")
+
+  for (item in typeData) {
+    data.addRow([item, typeData[item]])
+  }
+
+  var options = {'title':'Sprint breakdown by original estimate',
+                        'width':600,
+                        'height':500};
+  var chart = new google.visualization.PieChart($('#issue_o_hours_chart')[0]);
+  chart.draw(data, options);
+}
+
+function drawIssuesTable(issues) {
+  for (var issueType in issues) {
+    // cycle by issue
+    var section = "<tr><td><h3>" + issueType + "</h3><table>";
+    var subRows = new Array()
+    for (var i = 0; i < issues[issueType].length; i++) {
+      var issue = issues[issueType][i]
+      subRow = "<tr><td>" + issue.title + "</td></tr>";
+      subRows.push(subRow)
+      // console.log(issues[issueType][j])
+    }
+    section += subRows.join("\n")
+    section += "</td></tr><table>";
+    $('#issues').append(section)
+  }
+}
+</script>
+	</head>
+
+	<body onLoad="">
+        <table id="general">
+                <tr>
+                        <td>
+                                <div id="issue_count_chart"></div>
+                        </td>
+                        <td>
+                                <div id="issue_hours_chart"></div>
+                        </td>
+                 </tr>
+                <tr>
+                        <td>
+                                <div id="issue_o_hours_chart"></div>
+                        </td>
+                 </tr>
+        </table>
+
+        <table id="issues">
+        </table>
+
+
+	</body>
+</html>
