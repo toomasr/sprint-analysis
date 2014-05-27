@@ -76,19 +76,6 @@ function parseData(xmlText) {
       else
         data['issueTypeOHours'][type] += oEstimateSeconds;
 
-
-      /*
-        $xml.find("rss channel item key[id='"+parentId+"']").each(
-          function() {
-            var parentType = $(this).parent().find("type").text()
-            if (isNaN(parseInt(data['issueTypeCount'][parentType])))
-              data['issueTypeCount'][parentType] = 1
-            else
-              data['issueTypeCount'][parentType]++;
-            }
-        );
-        */
-
       // also lets add to the issues collection
       if (typeof data['issuesByType'][type] == "undefined") {
         data['issuesByType'][type] = new Array();

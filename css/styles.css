@@ -1,0 +1,16 @@
+.notEstimated {
+  color: #CC0000;
+  font-weight: bold;
+}
+
+.fail {
+  color: #CC0000
+}
+
+.success {
+  color: #008C00
+}
+
+.quicker {
+  color: #356AA0
+}
