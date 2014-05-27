@@ -3,7 +3,7 @@
 require("lib/TLogger.php");
 $log = new TLogger('uploads/my-log-file.log');
 
-define('SELF', $_SERVER['REQUEST_URI']);
+define('SELF', dirname($_SERVER['REQUEST_URI']));
 
 $ds = DIRECTORY_SEPARATOR;
 $storeFolder = 'uploads';   //2
@@ -15,6 +15,7 @@ if (!empty($_FILES)) {
   $targetFile = $targetPath.md5(rand().$targetFile.rand()).".xml";
 
   move_uploaded_file($tempFile,$targetFile);
+  $log->debug("Outputting ".basename($targetFile));
   die(basename($targetFile));
 }
 
@@ -79,7 +80,7 @@ if (!empty($_FILES)) {
 
       .container {
         width: auto;
-        max-width: 680px;
+        max-width: 900px;
       }
       .container .credit {
         margin: 20px 0;
@@ -106,6 +107,7 @@ if (!empty($_FILES)) {
     <script type="text/javascript" src="js/jquery.js"></script>
     <script type="text/javascript" src="js/humanize.js"></script>
     <script type="text/javascript" src="js/dropzone.js"></script>
+    <script type="text/javascript" src="js/sprint-report.js"></script>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 
     <script type="text/javascript">
@@ -117,13 +119,29 @@ if (!empty($_FILES)) {
         init: function() {
           this.on("success",
             function(file) {
-              document.location.href=dirname(document.location.href)+"/index.php?report="+file.xhr.response;
+              document.location.href="/toomasr/sprint-analysis/?report="+file.xhr.response;
             }
           );
         }
       };
     </script>
 
+
+<?php
+  if (isset($_GET['report']) && strlen($_GET['report'])>0) {
+    $reportUrl = SELF."/uploads/".$_GET['report'];
+?>
+    <script type="text/javascript">
+      function drawSprintReport() {
+        visualizeData('<?php echo $reportUrl; ?>');
+      }
+
+      google.load('visualization', '1.0', {'packages':['corechart']});
+      google.setOnLoadCallback(drawSprintReport);
+    </script>
+<?php
+  }
+?>
   </head>
 
 <body>
@@ -140,10 +158,9 @@ if (!empty($_FILES)) {
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="brand" href="#">JIRA Sprint Insight</a>
+            <a class="brand" href="<?php echo SELF; ?>">JIRA Sprint Insight</a>
             <div class="nav-collapse collapse">
               <ul class="nav">
-                <li class="active"><a href="<?php echo SELF; ?>">Home</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
                 <li class="dropdown">
@@ -169,11 +186,40 @@ if (!empty($_FILES)) {
         <div class="page-header">
           <h1>JIRA Sprint Insight</h1>
         </div>
+<?php
+  if (isset($_GET['report'])) {
+?>
+        <table id="general">
+                <tr>
+                        <td>
+                                <div id="issue_o_hours_chart"></div>
+                        </td>
+                        <td>
+                                <div id="issue_hours_chart"></div>
+                        </td>
+                 </tr>
+                <tr>
+                        <td>
+                                <div id="issue_count_chart"></div>
+                        </td>
+                 </tr>
+        </table>
+
+        <table id="issues">
+        </table>
+        <p></p>
+<?php
+  }
+  else {
+?>
         <p class="lead">
                 We like to sprint and we like to retrospect with more metrics. Throw your JIRA XML export here and analyze yourself also.
         </p>
         <form action="<?php echo SELF;?>" class="dropzone" id="my-awesome-dropzone">
         </form>
+<?php
+  }
+?>
       </div>
 
       <div id="push"></div>
