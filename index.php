@@ -1,3 +1,24 @@
+<?php
+
+require("lib/TLogger.php");
+$log = new TLogger('uploads/my-log-file.log');
+
+define('SELF', $_SERVER['REQUEST_URI']);
+
+$ds = DIRECTORY_SEPARATOR;
+$storeFolder = 'uploads';   //2
+
+if (!empty($_FILES)) {
+  $tempFile = $_FILES['file']['tmp_name'];
+  $targetPath = dirname( __FILE__ ) . $ds. $storeFolder . $ds;
+  $targetFile =  $_FILES['file']['name'];
+  $targetFile = $targetPath.md5(rand().$targetFile.rand()).".xml";
+
+  move_uploaded_file($tempFile,$targetFile);
+  die(basename($targetFile));
+}
+
+?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
   <head>
@@ -87,6 +108,22 @@
     <script type="text/javascript" src="js/dropzone.js"></script>
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 
+    <script type="text/javascript">
+      function dirname(path) {
+        return path.replace(/\\/g, '/').replace(/\/[^\/]*\/?$/, '');
+      }
+
+      Dropzone.options.myAwesomeDropzone = {
+        init: function() {
+          this.on("success",
+            function(file) {
+              document.location.href=dirname(document.location.href)+"/index.php?report="+file.xhr.response;
+            }
+          );
+        }
+      };
+    </script>
+
   </head>
 
 <body>
@@ -106,7 +143,7 @@
             <a class="brand" href="#">JIRA Sprint Insight</a>
             <div class="nav-collapse collapse">
               <ul class="nav">
-                <li class="active"><a href="/">Home</a></li>
+                <li class="active"><a href="<?php echo SELF; ?>">Home</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#contact">Contact</a></li>
                 <li class="dropdown">
@@ -135,7 +172,8 @@
         <p class="lead">
                 We like to sprint and we like to retrospect with more metrics. Throw your JIRA XML export here and analyze yourself also.
         </p>
-        <form action="/file-upload" class="dropzone" id="my-awesome-dropzone"></form>
+        <form action="<?php echo SELF;?>" class="dropzone" id="my-awesome-dropzone">
+        </form>
       </div>
 
       <div id="push"></div>
