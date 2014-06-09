@@ -8,3 +8,8 @@ or engineering tasks.
 
 Also quickly highlighting issues that we've haven't estimated too well is a big plus when you
 go over the sprints stats after the sprint.
+
+Sprint Analysis
+---------------
+
+![Screenshot](https://raw.githubusercontent.com/toomasr/sprint-analysis/master/images/screenshot-001.png)
