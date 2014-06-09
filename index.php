@@ -125,7 +125,7 @@ else {
           this.on("success",
             function(file) {
               //console.log(file.xhr.response)
-              document.location.href="/toomasr/sprint-analysis/?report="+file.xhr.response;
+              document.location.href="<?php echo SELF; ?>?report="+file.xhr.response;
             }
           );
         }
