@@ -1,14 +1,15 @@
 <?php
 
 require("lib/TLogger.php");
-$log = new TLogger('uploads/my-log-file.log');
+$log = new TLogger('uploads/sprint-analysis.log');
 
-define('SELF', dirname($_SERVER['REQUEST_URI']));
+define('SELF', dirname($_SERVER['PHP_SELF'])."/");
 
 $ds = DIRECTORY_SEPARATOR;
 $storeFolder = 'uploads';   //2
 
 if (!empty($_FILES)) {
+  $log->info("Processing upload");
   $tempFile = $_FILES['file']['tmp_name'];
   $targetPath = dirname( __FILE__ ) . $ds. $storeFolder . $ds;
   $targetFile =  $_FILES['file']['name'];
@@ -17,6 +18,10 @@ if (!empty($_FILES)) {
   move_uploaded_file($tempFile,$targetFile);
   $log->debug("Outputting ".basename($targetFile));
   die(basename($targetFile));
+}
+else {
+  $log->info($_FILES);
+  $log->info("Processing regular request for ".$_SERVER['REMOTE_ADDR']);
 }
 
 ?>
@@ -115,10 +120,11 @@ if (!empty($_FILES)) {
         return path.replace(/\\/g, '/').replace(/\/[^\/]*\/?$/, '');
       }
 
-      Dropzone.options.myAwesomeDropzone = {
+      Dropzone.options.myDropzone = {
         init: function() {
           this.on("success",
             function(file) {
+              //console.log(file.xhr.response)
               document.location.href="/toomasr/sprint-analysis/?report="+file.xhr.response;
             }
           );
@@ -203,7 +209,7 @@ if (!empty($_FILES)) {
         <p class="lead">
                 We like to sprint and we like to retrospect with more metrics. Throw your JIRA XML export here and analyze yourself also.
         </p>
-        <form action="<?php echo SELF;?>" class="dropzone" id="my-awesome-dropzone">
+        <form method="POST" action="<?php echo SELF;?>" class="dropzone" id="myDropzone" name="file">
         </form>
 <?php
   }
