@@ -16,7 +16,6 @@ if (!empty($_FILES)) {
   $targetFile = $targetPath.md5(rand().$targetFile.rand()).".xml";
 
   move_uploaded_file($tempFile,$targetFile);
-  $log->debug("Outputting ".basename($targetFile));
   die(basename($targetFile));
 }
 else {
