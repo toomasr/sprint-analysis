@@ -151,7 +151,7 @@ else {
 
 <body>
 
-<a href="https://github.com/toomasr/sprint-analysis"><img style="position: absolute; top: 0; right: 0; border: 0;z-index:1050;" src="https://camo.githubusercontent.com/e7bbb0521b397edbd5fe43e7f760759336b5e05f/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677265656e5f3030373230302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png"></a>
+<a href="https://github.com/toomasr/sprint-analysis"><img style="position: absolute; top: 0; right: 0; border: 0;z-index:1050;width: 149px; height: 149px;" src="http://aral.github.com/fork-me-on-github-retina-ribbons/right-green@2x.png" alt="Fork me on GitHub" data-canonical-src="http://aral.github.com/fork-me-on-github-retina-ribbons/right-green@2x.png"></a>
 <!-- Part 1: Wrap all page content here -->
     <div id="wrap">
 
@@ -207,7 +207,12 @@ else {
   else {
 ?>
         <p class="lead">
-                We like to sprint and we like to retrospect with more metrics. Throw your JIRA XML export here and analyze yourself also.
+                We like to sprint and we like to retrospect with more metrics. Throw your JIRA XML export here and analyze your own sprint. This
+tool will print out the original estimate breakdown and the time spent breakdown by issue type. For example the screenshot shows how much time
+we spent on bugs, improvements and engineering tasks.
+
+In the second section we outline issues by type and ordered by how much they were off from the original estimate. We find it beneficial to
+go over issues that had the estimate way off. For example 2 days instead of 1 day. At the same time we don't care about couple of hours here and there.
         </p>
         <form method="POST" action="<?php echo SELF;?>" class="dropzone" id="myDropzone" name="file">
         </form>
