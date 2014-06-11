@@ -139,6 +139,7 @@ else {
     <script type="text/javascript">
       function drawSprintReport() {
         visualizeData('<?php echo $reportUrl; ?>');
+        $("#about").hide();
       }
 
       google.load('visualization', '1.0', {'packages':['corechart']});
@@ -166,10 +167,9 @@ else {
             </button>
             <a class="brand" href="<?php echo SELF; ?>">JIRA Sprint Insight</a>
             <div class="nav-collapse collapse">
-              <!-- ul class="nav">
+              <ul class="nav">
                 <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-              </ul-->
+              </ul>
             </div><!--/.nav-collapse -->
           </div>
         </div>
@@ -207,18 +207,21 @@ else {
   else {
 ?>
         <p class="lead">
-                We like to sprint and we like to retrospect with more metrics. Throw your JIRA XML export here and analyze your own sprint. This
-tool will print out the original estimate breakdown and the time spent breakdown by issue type. For example the screenshot shows how much time
-we spent on bugs, improvements and engineering tasks.
-
-In the second section we outline issues by type and ordered by how much they were off from the original estimate. We find it beneficial to
-go over issues that had the estimate way off. For example 2 days instead of 1 day. At the same time we don't care about couple of hours here and there.
+                Throw your JIRA XML export here and analyze your own sprint.
         </p>
         <form method="POST" action="<?php echo SELF;?>" class="dropzone" id="myDropzone" name="file">
         </form>
 <?php
   }
 ?>
+        <p class="lead" id="about"><a name="about" ></a>
+        We like to sprint and we like to retrospect with more metrics. This
+tool will print out the original estimate breakdown and the time spent breakdown by issue type. For example the screenshot shows how much time
+we spent on bugs, improvements and engineering tasks.
+
+In the second section we outline issues by type and ordered by how much they were off from the original estimate. We find it beneficial to
+go over issues that had the estimate way off. For example 2 days instead of 1 day. At the same time we don't care about couple of hours here and there.
+        </p>
       </div>
 
       <div id="push"></div>
