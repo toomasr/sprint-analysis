@@ -5,7 +5,7 @@ Deny from all
 </Files>
 
 # Protect log.txt
-<Files ./uploads/sprint-analysis.log>
+<Files "sprint-analysis.log">
 Order Allow,Deny
 Deny from all
 </Files>
