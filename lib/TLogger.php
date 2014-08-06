@@ -17,7 +17,7 @@ class TLogger
     const WARN    = 2;
     const INFO    = 3;
     const DEBUG   = 4;
-		const ALL     = 5;
+    const ALL     = 5;
     const OFF     = 6;
 
     /**
@@ -102,6 +102,9 @@ class TLogger
      */
     public static function instance($logDirectory = false, $severity = false)
     {
+
+	date_default_timezone_set('UTC');
+
         if ($severity === false) {
             $severity = self::$_defaultSeverity;
         }
